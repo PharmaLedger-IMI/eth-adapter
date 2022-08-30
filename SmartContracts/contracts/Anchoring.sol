@@ -17,11 +17,13 @@ contract Anchoring {
     event Result(bytes str);
     event StringResult(string str);
     event UIntResult(uint str);
+    event UInt256Result(uint256 str);
     event Bytes32Result(bytes32 str);
     event Bytes1Result(bytes1 str);
     event BoolResult(bool str);
     event StringArrayResult(string[] str);
     event StringArray2Result(string[2] str);
+    event AddressResult(address addr);
 
     struct DynamicArray {
         bytes[] array;
@@ -424,6 +426,10 @@ contract Anchoring {
     }
 
     function validateSignature(string memory anchorId, string memory brickMapHash, string memory lastAnchorValue, string memory timestamp, bytes memory signature, uint8 v, bytes memory publicKey) private returns (bool) {
+        address addr = calculateAddress(publicKey);
+        address computedAddr = getAddressFromHashAndSig(anchorId, brickMapHash, lastAnchorValue, timestamp, signature, v);
+        emit AddressResult(addr);
+        emit AddressResult(computedAddr);
         bool res = calculateAddress(publicKey) == getAddressFromHashAndSig(anchorId, brickMapHash, lastAnchorValue, timestamp, signature, v);
         if (!res) {
             res = sha256(abi.encodePacked(publicKey)) == sha256(abi.encodePacked(getAddressFromHashAndSig(anchorId, brickMapHash, lastAnchorValue, timestamp, signature, v)));
@@ -442,6 +448,7 @@ contract Anchoring {
     {
         //use abi.encodePacked to not pad the inputs
         if (keccak256(bytes(lastAnchorValue)) == keccak256(bytes(""))) {
+            emit Bytes32Result(sha256(abi.encodePacked(anchorId, brickMapHash, timestamp)));
             return sha256(abi.encodePacked(anchorId, brickMapHash, timestamp));
         } else {
             return sha256(abi.encodePacked(anchorId, brickMapHash, lastAnchorValue, timestamp));
@@ -495,6 +502,12 @@ contract Anchoring {
             s := mload(add(signature, 64))
         }
 
-        return ecrecover(hash, v, r, s);
+        uint8 id;
+        assembly {
+            id := chainid()
+        }
+
+        uint8 normalizedV = v - 2 * id - 10;
+        return ecrecover(hash, normalizedV, r, s);
     }
 }
