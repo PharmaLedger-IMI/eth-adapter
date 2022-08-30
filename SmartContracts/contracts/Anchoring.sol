@@ -495,11 +495,6 @@ contract Anchoring {
             s := mload(add(signature, 64))
         }
 
-        if (v != 27 && v != 28) {
-            return (address(0));
-        } else {
-            // solium-disable-next-line arg-overflow
-            return ecrecover(hash, v, r, s);
-        }
+        return ecrecover(hash, v, r, s);
     }
 }
