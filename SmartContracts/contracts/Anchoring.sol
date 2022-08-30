@@ -512,7 +512,7 @@ contract Anchoring {
             s := mload(add(signature, 64))
         }
 
-        uint8 normalizedV = v - 2 * id - 10;
+        uint8 normalizedV = v - 2 * getChainId() - 10;
         return ecrecover(hash, normalizedV, r, s);
     }
 }
