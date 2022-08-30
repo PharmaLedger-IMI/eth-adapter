@@ -483,6 +483,16 @@ contract Anchoring {
         return abi.encodePacked(first32, second32);
     }
 
+    function getChainId() public returns (uint8)
+    {
+        uint8 id;
+        assembly {
+            id := chainid()
+        }
+
+        return id;
+    }
+
     function recover(bytes32 hash, bytes memory signature, uint8 v) public returns (address)
     {
         bytes32 r;
@@ -500,11 +510,6 @@ contract Anchoring {
         assembly {
             r := mload(add(signature, 32))
             s := mload(add(signature, 64))
-        }
-
-        uint8 id;
-        assembly {
-            id := chainid()
         }
 
         uint8 normalizedV = v - 2 * id - 10;
