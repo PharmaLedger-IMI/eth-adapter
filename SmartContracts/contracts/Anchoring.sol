@@ -142,7 +142,7 @@ contract Anchoring {
     }
 
     function createOrUpdateMultipleAnchors(string[] memory anchors) public {
-        for (uint i = 0; i < anchors.length - 3; i += 3) {
+        for (uint i = 0; i < anchors.length - 1; i += 2) {
             string memory anchorId = anchors[i];
             string memory newAnchorValue = anchors[i + 1];
             bytes[] memory anchorIdComponents = parseSSI(anchorId);
@@ -152,7 +152,7 @@ contract Anchoring {
             }
         }
 
-        for (uint i = 0; i < anchors.length - 3; i += 3) {
+        for (uint i = 0; i < anchors.length - 1; i += 2) {
             string memory anchorId = anchors[i];
             string memory newAnchorValue = anchors[i + 1];
             if (anchorValues[anchorId].length == 0) {
